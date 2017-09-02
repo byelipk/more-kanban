@@ -1,0 +1,41 @@
+{
+  "name": "Kanban",
+  "version": "1.0.0",
+  "description": "A tic tac toe game to learn more about React and Phoenix",
+  "main": "/priv/static/app.js",
+  "author": "Pat White",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server",
+    "watch": "webpack --watch --color",
+    "tags": "ctags -R",
+    "test": "jest",
+    "test:update": "jest -u"
+  },
+  "jest": {
+    "snapshotSerializers": [
+      "jest-serializer-enzyme"
+    ]
+  },
+  "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-jest": "^20.0.3",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "css-loader": "^0.28.5",
+    "enzyme": "^2.9.1",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "jest": "^20.0.4",
+    "jest-serializer-enzyme": "^1.0.0",
+    "react-test-renderer": "^15.6.1",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1"
+  }
+}
