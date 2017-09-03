@@ -1,16 +1,21 @@
 const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+// NOTE
+// For more info on Webpack config files see:
+// https://webpack.js.org/configuration/
 
 module.exports = {
   context: __dirname,
-  entry: [
-    './assets/js/app.jsx'
-  ],
-  devtool: 'cheap-eval-source-map',
+  entry: {
+    app: './lib/kanban_client/js/app.jsx'
+  },
+  devtool: 'source-map',
   output: {
-    path: path.join(__dirname, 'priv/static'),
-    filename: 'bundle.js',
+    path: path.join(__dirname, './priv/static/'),
+    filename: 'js/[name].bundle.js',
     publicPath: '/priv/static/'
   },
   devServer: {
@@ -37,13 +42,14 @@ module.exports = {
         exclude: /node_modules/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: 'css-loader'
+          use: 'css-loader',
+          publicPath: '/priv/static/css/'
         })
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin('css/[name].styles.css'),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': process.env.NODE_ENV
     })
