@@ -24,7 +24,7 @@ defmodule KanbanWeb.Router do
     pipe_through :api
 
     scope "/v1", V1, as: :v1 do
-      resources "/boards", BoardsController, only: [:index]
+      resources "/boards", BoardController, only: [:index, :show]
     end
   end
 end
