@@ -7,14 +7,18 @@
     <meta name="description" content="An example app using Elixir/Phoenix and Webpack/React">
     <meta name="author" content="Pat White">
     
-    <title>Hello Kanban! 🤡</title>
+    <title>{{ htmlWebpackPlugin.options.title }}</title>
 
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app-8f3e3b02e4204ac1a3cd.styles.css") %>">
+    {{#each htmlWebpackPlugin.files.css as |css|}}
+    <link rel="stylesheet" href="<%= static_path(@conn, "{{helper css}}") %>">
+    {{/each}}
   </head>
 
   <body>
     <%= render @view_module, @view_template, assigns %>
 
-    <script src="<%= static_path(@conn, "/js/app-8f3e3b02e4204ac1a3cd.bundle.js") %>"></script>
+    {{#each htmlWebpackPlugin.files.js as |js|}}
+    <script src="<%= static_path(@conn, "{{helper js}}") %>"></script>
+    {{/each}}
   </body>
 </html>
