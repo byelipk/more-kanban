@@ -9731,6 +9731,15 @@ var App = function (_React$Component) {
   }
 
   _createClass(App, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      fetch("/api/v1/boards").then(function (results) {
+        return results.json();
+      }).then(function (boards) {
+        return console.log(boards);
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
