@@ -20,7 +20,11 @@ defmodule KanbanWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", KanbanWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", KanbanWeb do
+    pipe_through :api
+
+    scope "/v1", V1, as: :v1 do
+      resources "/boards", BoardsController, only: [:index]
+    end
+  end
 end
