@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="An example app using Elixir/Phoenix and Webpack/React">
     <meta name="author" content="Pat White">
-    
+
     <title>{{ htmlWebpackPlugin.options.title }}</title>
+
+    <link rel="shortcut icon" href="<%= static_path(@conn, "/favicon.ico") %>">
 
     {{#each htmlWebpackPlugin.files.css as |css|}}
     <link rel="stylesheet" href="<%= static_path(@conn, "{{helper css}}") %>">
@@ -15,7 +17,9 @@
   </head>
 
   <body>
-    <%= render @view_module, @view_template, assigns %>
+    <div class="container">
+      <%= render @view_module, @view_template, assigns %>
+    </div>
 
     {{#each htmlWebpackPlugin.files.js as |js|}}
     <script src="<%= static_path(@conn, "{{helper js}}") %>"></script>

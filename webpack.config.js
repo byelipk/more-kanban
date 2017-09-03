@@ -10,12 +10,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   context: __dirname,
   entry: {
-    app: './lib/kanban_client/js/app.jsx'
+    app: './kanban_client/js/app.jsx'
   },
   devtool: 'source-map',
   output: {
     path: path.join(__dirname, './priv/static/'),
-    filename: 'js/[name]-[hash].bundle.js',
+    filename: 'js/[name].bundle.js',
     publicPath: '/priv/static/'
   },
   devServer: {
@@ -37,14 +37,14 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader'
       },
-      
+
       {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
           use: 'css-loader',
-          publicPath: '/priv/static/css/'
+          publicPath: '/priv/static/'
         })
       },
 
@@ -56,7 +56,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new ExtractTextPlugin('css/[name]-[hash].styles.css'),
+    new ExtractTextPlugin('css/[name].styles.css'),
 
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': process.env.NODE_ENV
@@ -64,9 +64,9 @@ module.exports = {
 
     // See: https://github.com/jaketrent/html-webpack-template
     new HtmlWebpackPlugin({
-      template: './template.hbs',
+      template: './kanban_client/template.hbs',
       inject: false,
-      filename: __dirname + '/lib/kanban_server_web/templates/layout/app.html.eex',
+      filename: __dirname + '/lib/kanban_server_web/templates/layout/kanban.html.eex',
       title: 'Hello Kanban! 🤡'
     })
   ]
