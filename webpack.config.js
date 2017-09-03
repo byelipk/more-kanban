@@ -10,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   context: __dirname,
   entry: {
-    app: './kanban_client/js/app.jsx'
+    app: './lib/kanban_client/js/app.jsx'
   },
   devtool: 'source-map',
   output: {
@@ -64,7 +64,7 @@ module.exports = {
 
     // See: https://github.com/jaketrent/html-webpack-template
     new HtmlWebpackPlugin({
-      template: './kanban_client/template.hbs',
+      template: './lib/kanban_client/template.hbs',
       inject: false,
       filename: __dirname + '/lib/kanban_server_web/templates/layout/kanban.html.eex',
       title: 'Hello Kanban! 🤡'
