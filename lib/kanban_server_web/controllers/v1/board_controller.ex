@@ -3,6 +3,8 @@ defmodule KanbanWeb.V1.BoardController do
 
   alias Kanban.{ Repo, Board }
 
+  plug :fetch_board when action in [:delete]
+
   def index(conn, _params) do
     render conn, "index.json", boards: Repo.all(Board)
   end
@@ -32,6 +34,30 @@ defmodule KanbanWeb.V1.BoardController do
         conn
         |> put_status(201)
         |> render("show.json", board: board)
+    end
+  end
+
+  def delete(conn, _params) do
+    case Repo.delete(conn.board) do
+      {:ok, _struct} ->
+        conn
+        |> send_resp(200, "")
+
+      {:error, changeset} ->
+        conn
+        |> render("error.json", error: changeset)
+    end
+  end
+
+  def fetch_board(conn, %{"id" => id}) do
+    case Repo.get(Board, id) do
+      nil ->
+        conn
+        |> put_status(404)
+        |> render("not-found.json")
+
+      {:ok, board} ->
+        assign(conn, :board, board)
     end
   end
 

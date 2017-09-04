@@ -63,4 +63,26 @@ defmodule KanbanWeb.Api.V1.BoardControllerTest do
 
   end
 
+  describe "DELETE /:id" do
+
+    test "it returns 200 OK", %{conn: conn} do
+      article_1 = insert(:board)
+
+      conn =
+        conn
+        |> get(v1_board_path(conn, :delete, article_1.id))
+
+      assert json_response(conn, 200)
+    end
+
+    test "it returns 404 when Board is not found", %{conn: conn} do
+      conn =
+        conn
+        |> get(v1_board_path(conn, :delete, 123))
+
+      assert json_response(conn, 404)
+    end
+
+  end
+
 end
