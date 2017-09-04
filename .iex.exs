@@ -1,0 +1,1 @@
+alias Kanban.{ Repo, Board }

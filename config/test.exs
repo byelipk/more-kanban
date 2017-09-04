@@ -12,8 +12,8 @@ config :logger, level: :warn
 # Configure your database
 config :kanban_server, Kanban.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
   database: "kanban_server_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+import_config "local.secret.exs"

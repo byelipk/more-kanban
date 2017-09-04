@@ -20,6 +20,7 @@ defmodule KanbanWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import KanbanWeb.Router.Helpers
+      import Kanban.ConnCaseHelper
 
       # The default endpoint for testing
       @endpoint KanbanWeb.Endpoint

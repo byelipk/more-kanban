@@ -13,4 +13,12 @@ defmodule KanbanWeb.V1.BoardView do
     %{id: board.id, title: board.title}
   end
 
+  def render("not-found.json", _params) do
+    %{error: "Not found"}
+  end
+
+  def render("error.json", _params) do
+    %{error: "Something went wrong"}
+  end
+
 end

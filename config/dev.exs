@@ -60,4 +60,4 @@ config :kanban_server, Kanban.Repo,
   pool_size: 10
 
 
-import_config "dev.secret.exs"
+import_config "local.secret.exs"
