@@ -10,11 +10,17 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Kanban.{ Repo, Board, List }
+alias Kanban.{ Repo, Board, List, Card }
 
 b1 = Repo.insert!(%Board{title: "Welcome to Kanban!"})
 
-Repo.insert!(%List{name: "Get started", board: b1})
+l1 = Repo.insert!(%List{name: "Get started", board: b1})
 Repo.insert!(%List{name: "Questions about the event", board: b1})
 Repo.insert!(%List{name: "What is Kanban?", board: b1})
 Repo.insert!(%List{name: "Todo list", board: b1})
+
+Repo.insert!(%Card{body: "Hello world", list: l1})
+Repo.insert!(%Card{body: "Boodbye world", list: l1})
+Repo.insert!(%Card{body: "So long", list: l1})
+Repo.insert!(%Card{body: "Farewell", list: l1})
+Repo.insert!(%Card{body: "Let's go", list: l1})

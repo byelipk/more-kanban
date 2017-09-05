@@ -1,1 +1,1 @@
-alias Kanban.{ Repo, Board, List }
+alias Kanban.{ Repo, Board, List, Card }
