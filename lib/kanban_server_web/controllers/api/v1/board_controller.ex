@@ -43,9 +43,26 @@ defmodule KanbanWeb.Api.V1.BoardController do
         conn
         |> send_resp(200, "")
 
-      {:error, changeset} ->
+      {:error, details} ->
         conn
-        |> render("error.json", error: changeset)
+        |> render("error.json", error: details)
+    end
+  end
+
+  def update(conn, %{"id" => id, "data" => params}) do
+    board = Repo.get!(Board, id)
+    changeset = Board.changeset(board, params)
+
+    case Repo.update(changeset) do
+      { :ok, board }->
+        conn
+        |> put_status(200)
+        |> render("show.json", board: board)
+
+      { :error, details }->
+        conn
+        |> put_status(422)
+        |> render("error.json", error: details)
     end
   end
 

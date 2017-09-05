@@ -85,4 +85,48 @@ defmodule KanbanWeb.Api.V1.BoardControllerTest do
 
   end
 
+  describe "PUT /:id" do
+
+    test "it returns 200 OK", %{conn: conn} do
+      article_1 = insert(:board)
+
+      conn =
+        conn
+        |> put(api_v1_board_path(
+          conn, :update, article_1.id, %{data: %{title: "This town rocks!"}}))
+
+      assert json_response(conn, 200)
+    end
+
+    test "it updates the correct property", %{conn: conn} do
+      article_1 = insert(:board)
+
+      response =
+        conn
+        |> put(api_v1_board_path(conn, :update, article_1.id, %{data: %{title: "This town rocks!"}}))
+        |> json_response(200)
+
+      assert response["data"]["title"] === "This town rocks!"
+    end
+
+    test "it returns 404 when Board is not found", %{conn: conn} do
+      conn =
+        conn
+        |> get(api_v1_board_path(conn, :update, 123))
+
+      assert json_response(conn, 404)
+    end
+
+    test "it does not modify record when params are incorrect", %{conn: conn} do
+      board = insert(:board)
+
+      response =
+        conn
+        |> put(api_v1_board_path(conn, :update, board.id, %{data: %{hacked: "This town rocks!"}}))
+        |> json_response(200)
+
+      assert response["data"]["title"] === board.title
+    end
+  end
+
 end
