@@ -15,7 +15,7 @@ defmodule Kanban.List do
   @doc false
   def changeset(%Kanban.List{} = list, attrs) do
     list
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :board_id])
     |> validate_required([:name, :board_id])
   end
 end

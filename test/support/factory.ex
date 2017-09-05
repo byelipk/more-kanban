@@ -15,4 +15,11 @@ defmodule Kanban.Factory do
     }
   end
 
+  def card_factory do
+    %Kanban.Card{
+      body: sequence(:body, &("Here is my body #{&1}")),
+      list: build(:list)
+    }
+  end
+
 end
