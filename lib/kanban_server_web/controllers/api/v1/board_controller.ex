@@ -1,4 +1,4 @@
-defmodule KanbanWeb.V1.BoardController do
+defmodule KanbanWeb.Api.V1.BoardController do
   use KanbanWeb, :controller
 
   alias Kanban.{ Repo, Board }

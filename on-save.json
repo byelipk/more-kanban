@@ -1,0 +1,8 @@
+[
+  {
+    "srcDir": ".",
+    "destDir": ".",
+    "files": "*.{js,jsx,ex,exs,eex}",
+    "command": "yarn tags"
+  }
+]
