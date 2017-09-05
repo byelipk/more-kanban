@@ -1,11 +1,12 @@
 defmodule Kanban.Board do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Kanban.Board
+  alias Kanban.{ Board, List }
 
 
   schema "boards" do
     field :title, :string
+    has_many :lists, List
 
     timestamps()
   end
