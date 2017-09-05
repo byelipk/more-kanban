@@ -27,29 +27,28 @@ defmodule KanbanWeb.Api.V1.ListControllerTest do
 
   end
 
+  describe "GET /:id" do
 
-  # describe "GET /:id" do
-  #
-  #   test "it returns a sigle Board", %{conn: conn} do
-  #     article_1 = insert(:board)
-  #
-  #     conn =
-  #       conn
-  #       |> get(api_v1_list_path(conn, :show, article_1.id))
-  #
-  #     assert json_response(conn, 200) == render_json(ListView, "show.json", conn.assigns)
-  #   end
-  #
-  #   test "it returns 404 when Board is not found", %{conn: conn} do
-  #     conn =
-  #       conn
-  #       |> get(api_v1_list_path(conn, :show, 123))
-  #
-  #     assert json_response(conn, 404) == render_json(ListView, "not-found.json", conn.assigns)
-  #   end
-  #
-  # end
-  #
+    test "it returns a sigle List", %{conn: conn} do
+      list = insert(:list)
+
+      conn =
+        conn
+        |> get(api_v1_list_path(conn, :show, list.id))
+
+      assert json_response(conn, 200) == render_json(ListView, "show.json", conn.assigns)
+    end
+
+    test "it returns 404 when List is not found", %{conn: conn} do
+      conn =
+        conn
+        |> get(api_v1_list_path(conn, :show, 123))
+
+      assert json_response(conn, 404) == render_json(ListView, "missing-list.json", conn.assigns)
+    end
+
+  end
+
   describe "POST /" do
 
     test "it returns a new List when attributes are valid", %{conn: conn} do
@@ -103,49 +102,37 @@ defmodule KanbanWeb.Api.V1.ListControllerTest do
     end
 
   end
-  #
-  # describe "PUT /:id" do
-  #
-  #   test "it returns 200 OK", %{conn: conn} do
-  #     article_1 = insert(:board)
-  #
-  #     conn =
-  #       conn
-  #       |> put(api_v1_list_path(
-  #         conn, :update, article_1.id, %{data: %{title: "This town rocks!"}}))
-  #
-  #     assert json_response(conn, 200)
-  #   end
-  #
-  #   test "it updates the correct property", %{conn: conn} do
-  #     article_1 = insert(:board)
-  #
-  #     response =
-  #       conn
-  #       |> put(api_v1_list_path(conn, :update, article_1.id, %{data: %{title: "This town rocks!"}}))
-  #       |> json_response(200)
-  #
-  #     assert response["data"]["title"] === "This town rocks!"
-  #   end
-  #
-  #   test "it returns 404 when Board is not found", %{conn: conn} do
-  #     conn =
-  #       conn
-  #       |> get(api_v1_list_path(conn, :update, 123))
-  #
-  #     assert json_response(conn, 404)
-  #   end
-  #
-  #   test "it does not modify record when params are incorrect", %{conn: conn} do
-  #     board = insert(:board)
-  #
-  #     response =
-  #       conn
-  #       |> put(api_v1_list_path(conn, :update, board.id, %{data: %{hacked: "This town rocks!"}}))
-  #       |> json_response(200)
-  #
-  #     assert response["data"]["title"] === board.title
-  #   end
-  # end
+
+  describe "PUT /:id" do
+
+    test "it returns 200 OK", %{conn: conn} do
+      list = insert(:list)
+
+      conn =
+        conn
+        |> put(api_v1_list_path(conn, :update, list.id, %{data: %{name: "Update", board_id: list.board_id}}))
+
+      assert json_response(conn, 200) == render_json(ListView, "show.json", conn.assigns)
+    end
+
+    test "it returns 404 when List is not found", %{conn: conn} do
+      conn =
+        conn
+        |> put(api_v1_list_path(conn, :update, 123))
+
+      assert json_response(conn, 404)
+    end
+
+    test "it does not modify record when params are incorrect", %{conn: conn} do
+      list = insert(:list)
+
+      response =
+        conn
+        |> put(api_v1_list_path(conn, :update, list.id, %{data: %{hacked: "This town rocks!"}}))
+        |> json_response(200)
+
+      assert response["data"]["name"] === list.name
+    end
+  end
 
 end

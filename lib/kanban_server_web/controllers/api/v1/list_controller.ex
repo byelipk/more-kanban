@@ -7,13 +7,17 @@ defmodule KanbanWeb.Api.V1.ListController do
 
   plug :verify_board_id when action in [:index, :create]
   plug :find_board      when action in [:create]
-  plug :find_list       when action in [:delete]
+  plug :find_list       when action in [:delete, :update, :show]
 
   def index(conn, _params) do
     lists = Repo.all(from l in List,
                      where: l.board_id == ^conn.assigns.board_id)
 
     render conn, "index.json", lists: lists
+  end
+
+  def show(conn, _params) do
+    render conn, "show.json", list: conn.assigns.list
   end
 
   def create(conn, params) do
@@ -42,6 +46,23 @@ defmodule KanbanWeb.Api.V1.ListController do
         conn
         |> render("error.json", error: details)
     end
+  end
+
+  def update(conn, %{"id" => _id, "data" => attrs}) do
+    changeset = List.changeset(conn.assigns.list, attrs)
+
+    case Repo.update(changeset) do
+      { :ok, list } ->
+        conn
+        |> put_status(200)
+        |> render("show.json", list: list)
+
+      { :error, details } ->
+        conn
+        |> put_status(422)
+        |> render("error.json", error: details)
+    end
+
   end
 
   defp verify_board_id(conn, _) do

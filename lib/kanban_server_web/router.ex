@@ -25,7 +25,7 @@ defmodule KanbanWeb.Router do
 
     scope "/v1", V1, as: :v1 do
       resources "/boards", BoardController, only: [:index, :show, :create, :delete, :update]
-      resources "/lists", ListController, only: [:index, :create, :delete]
+      resources "/lists", ListController, only: [:index, :create, :delete, :update, :show]
       resources "/cards", CardController, only: [:index]
     end
   end
