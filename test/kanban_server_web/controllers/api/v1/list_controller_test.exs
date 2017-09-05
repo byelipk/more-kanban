@@ -81,28 +81,28 @@ defmodule KanbanWeb.Api.V1.ListControllerTest do
     end
 
   end
-  #
-  # describe "DELETE /:id" do
-  #
-  #   test "it returns 200 OK", %{conn: conn} do
-  #     article_1 = insert(:board)
-  #
-  #     conn =
-  #       conn
-  #       |> get(api_v1_list_path(conn, :delete, article_1.id))
-  #
-  #     assert json_response(conn, 200)
-  #   end
-  #
-  #   test "it returns 404 when Board is not found", %{conn: conn} do
-  #     conn =
-  #       conn
-  #       |> get(api_v1_list_path(conn, :delete, 123))
-  #
-  #     assert json_response(conn, 404)
-  #   end
-  #
-  # end
+
+  describe "DELETE /:id" do
+
+    test "it returns 200 OK", %{conn: conn} do
+      list = insert(:list)
+
+      conn =
+        conn
+        |> delete(api_v1_list_path(conn, :delete, list.id))
+
+      assert response(conn, 200)
+    end
+
+    test "it returns 404 when List is not found", %{conn: conn} do
+      conn =
+        conn
+        |> delete(api_v1_list_path(conn, :delete, 123))
+
+      assert response(conn, 404)
+    end
+
+  end
   #
   # describe "PUT /:id" do
   #
