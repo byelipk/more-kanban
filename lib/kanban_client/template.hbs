@@ -21,9 +21,7 @@
   </head>
 
   <body>
-    <div class="container">
-      <%= render @view_module, @view_template, assigns %>
-    </div>
+    <%= render @view_module, @view_template, assigns %>
 
     {{#each htmlWebpackPlugin.files.js as |js|}}
     <script src="<%= static_path(@conn, "{{helper js}}") %>"></script>
