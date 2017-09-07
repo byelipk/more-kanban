@@ -13,8 +13,9 @@
 
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.styles.css") %>">
 
-    <script defer src="<%= static_path(@conn, "/js/regular.js") %>"></script>
-    <script defer src="<%= static_path(@conn, "/js/fontawesome.js") %>"></script>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/font-awesome-regular.css") %>">
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/font-awesome-solid.css") %>">
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/font-awesome-core.css") %>">
   </head>
 
   <body>
