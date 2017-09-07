@@ -14,6 +14,9 @@
     {{#each htmlWebpackPlugin.files.css as |css|}}
     <link rel="stylesheet" href="<%= static_path(@conn, "{{helper css}}") %>">
     {{/each}}
+
+    <script defer src="<%= static_path(@conn, "/js/regular.js") %>"></script>
+    <script defer src="<%= static_path(@conn, "/js/fontawesome.js") %>"></script>
   </head>
 
   <body>

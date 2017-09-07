@@ -12,6 +12,9 @@
     <link rel="shortcut icon" href="<%= static_path(@conn, "/favicon.ico") %>">
 
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.styles.css") %>">
+
+    <script defer src="<%= static_path(@conn, "/js/regular.js") %>"></script>
+    <script defer src="<%= static_path(@conn, "/js/fontawesome.js") %>"></script>
   </head>
 
   <body>
