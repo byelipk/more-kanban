@@ -5,15 +5,19 @@ defmodule KanbanWeb.Api.V1.ListController do
 
   alias Kanban.{ Repo, List, Board }
 
-  plug :verify_board_id when action in [:index, :create]
+  plug :verify_board_id when action in [:create]
   plug :find_board      when action in [:create]
   plug :find_list       when action in [:delete, :update, :show]
 
-  def index(conn, _params) do
-    lists = Repo.all(from l in List,
-                     where: l.board_id == ^conn.assigns.board_id)
+  def index(conn, params) do
+    case params["board_id"] do
+      nil -> missing_board(conn)
+      id  ->
+        lists = Repo.all(from l in List,
+                         where: l.board_id == ^id)
 
-    render conn, "index.json", lists: lists
+        render conn, "index.json", lists: lists
+    end
   end
 
   def show(conn, _params) do
