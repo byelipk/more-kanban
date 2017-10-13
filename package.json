@@ -21,6 +21,7 @@
   "dependencies": {
     "global": "^4.3.2",
     "react": "^15.6.1",
+    "react-beautiful-dnd": "^2.4.0",
     "react-dom": "^15.6.1"
   },
   "devDependencies": {
