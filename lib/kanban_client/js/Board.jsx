@@ -2,7 +2,15 @@ import React from "react";
 
 import BoardList from "./BoardList";
 
-// import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+
+const reorder = (list, startIndex, endIndex) => {
+  var result = Array.from(list);
+  var [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 
 class Board extends React.Component {
   constructor(props) {
@@ -11,6 +19,25 @@ class Board extends React.Component {
     this.state = {
       lists: []
     };
+
+    this.onDragEnd = this.onDragEnd.bind(this);
+  }
+
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    var lists = reorder(
+      this.state.lists,
+      result.source.index,
+      result.destination.index
+    );
+
+    this.setState({
+      lists,
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -23,14 +50,20 @@ class Board extends React.Component {
 
   render() {
     return (
-      <div className="board-container">
-        <h1 className="board-title">{this.props.board.title}</h1>
-          <div className="board-body">
-            {this.state.lists.map(list => (
-              <BoardList key={list.id} list={list} />
-            ))}
-          </div>
-      </div>
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId="BOARD" type="COLUMN" direction="horizontal" >
+          {provided => (
+            <div className="board-container" ref={provided.innerRef}>
+              <h1 className="board-title">{this.props.board.title}</h1>
+                <div className="board-body">
+                    {this.state.lists.map(list => (
+                      <BoardList key={list.id} list={list} />
+                    ))}
+                </div>
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     );
   }
 }

@@ -6,6 +6,10 @@ import ReactDOM from 'react-dom';
 import Navbar from './Navbar';
 import Board from './Board';
 
+// import { DragDropContext } from 'react-beautiful-dnd';
+
+// a little function to help us with reordering the result
+
 class App extends React.Component {
 
   constructor(props) {

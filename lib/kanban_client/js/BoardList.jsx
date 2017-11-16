@@ -3,6 +3,12 @@ import React from 'react';
 import ListForm from './ListForm';
 import ListCard from './ListCard';
 
+import { Draggable } from 'react-beautiful-dnd';
+
+function getClassNames(isDragging) {
+  return `list-inner ${isDragging ? 'is-dragging' : ''}`;
+}
+
 class BoardList extends React.Component {
   constructor(props) {
     super(props);
@@ -62,19 +68,27 @@ class BoardList extends React.Component {
     );
   }
 
+
   render() {
     return (
-      <div className="list-card">
-        <header className="list-header">
-          <h3>{this.props.list.name}</h3>
-        </header>
-        <section className="list-content">
-          {this.state.cards.map(card => <ListCard key={card.id} card={card} /> )}
-        </section>
-        <footer className="list-footer">
-          {this.cardCreateFormOrCreateButton()}
-        </footer>
-      </div>
+      <Draggable draggableId={this.props.list.id} type="COLUMN" >
+        {(provided, snapshot)=> (
+          <div className="list-card">
+            <div className={getClassNames(snapshot.isDragging)} ref={provided.innerRef} style={provided.draggableStyle}>
+              <header className="list-header" {...provided.dragHandleProps}>
+                <h3>{this.props.list.name}</h3>
+              </header>
+              <section className="list-content">
+                {this.state.cards.map(card => <ListCard key={card.id} card={card} /> )}
+              </section>
+              <footer className="list-footer">
+                {this.cardCreateFormOrCreateButton()}
+              </footer>
+            </div>
+            {provided.placeholder}
+          </div>
+         )}
+       </Draggable>
     );
   }
 }

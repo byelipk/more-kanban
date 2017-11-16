@@ -139,28 +139,44 @@ body {
 }
 
 .list-card {
-  flex: auto;
-  background: #E2E4E6;
-  border-radius: 3px;
   width: 365px;
-  margin-right: 1rem;
   display: flex;
+  flex: auto;
   flex-direction: column;
   flex-shrink: 0;
+  flex-grow: 0;
 }
-
+.list-inner {
+  background: #E2E4E6;
+  margin-right: 1rem;
+  border-radius: 3px;
+}
+.list-inner.is-dragging {
+  cursor: -webkit-grabbing;
+  box-shadow: 1px 1px 4px 1px rgba(0, 0, 0, 0.2);
+}
 .list-header {
   flex: auto;
   padding: 0.5rem;
+  border-radius: 3px;
 }
-
+.list-header:hover {
+  cursor: -webkit-grab;
+  background: #dadada;
+}
+.list-header:active {
+  background: #c1c2c3;
+}
 .list-header h3 {
   font-weight: bold;
   font-size: .9rem;
 }
-
 .list-content {
   padding: 0.5rem;
+}
+.list-footer {
+  padding: 0.5rem;
+  color: #8c8c8c;
 }
 
 .card {
@@ -172,29 +188,22 @@ body {
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
 }
-
 .card-body {
   display: flex;
 }
-
 .card-details {
   flex: auto;
 }
-
 .card-actions {
   flex: initial;
 }
-
 .card-actions button {
   border: none;
   background: none;
   cursor: pointer;
 }
 
-.list-footer {
-  padding: 0.5rem;
-  color: #8c8c8c;
-}
+
 
 .btn {
   padding: 0.5rem 1rem;
