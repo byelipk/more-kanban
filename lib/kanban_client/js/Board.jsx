@@ -4,7 +4,7 @@ import BoardList from "./BoardList";
 
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
-const reorder = (list, startIndex, endIndex) => {
+function reorder(list, startIndex, endIndex) {
   var result = Array.from(list);
   var [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
@@ -28,13 +28,13 @@ class Board extends React.Component {
     if (!result.destination) {
       return;
     }
-
+  
     var lists = reorder(
       this.state.lists,
       result.source.index,
       result.destination.index
     );
-
+  
     this.setState({
       lists,
     });
