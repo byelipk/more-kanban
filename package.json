@@ -1,7 +1,7 @@
 {
   "name": "Kanban",
   "version": "1.0.0",
-  "description": "A tic tac toe game to learn more about React and Phoenix",
+  "description": "A Kanban UI to learn more about Webpack, React, and Phoenix",
   "main": "/priv/static/app.js",
   "author": "Pat White",
   "license": "MIT",
@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "global": "^4.3.2",
-    "react": "^15.6.1",
-    "react-beautiful-dnd": "^2.4.0",
-    "react-dom": "^15.6.1"
+    "react": "^16.0",
+    "react-beautiful-dnd": "^2.6.2",
+    "react-dom": "^16.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
