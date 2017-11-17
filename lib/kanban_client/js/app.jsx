@@ -49,6 +49,8 @@ class App extends React.Component {
   }
 
   onDragEnd(result) {
+    if (!result.destination) return;
+
     var result = this.store.onDragEnd(result);
 
     if (result.type === "COLUMN") {
