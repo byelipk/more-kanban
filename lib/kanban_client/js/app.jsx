@@ -6,63 +6,56 @@ import ReactDOM from 'react-dom';
 import Navbar from './Navbar';
 import Board from './Board';
 
+import Store from './data-store';
+
 import { DragDropContext } from 'react-beautiful-dnd';
-
-// a little function to help us with reordering the result
-function reorder(list, startIndex, endIndex) {
-  var result = Array.from(list);
-  var [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
 
+    this.store = Store.init();
+
     this.state = {
-      board: {}
+      board: {},
+      lists: [],
+      cards: []
     }
 
     this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   componentDidMount() {
-    fetch('/api/v1/boards/1')
-      .then(response => response.json())
-      .then(json => this.setState({board: json.data}))
-      .catch(console.error);
+    this.store.getBoard(1)
+      .then(board => {
+        this.setState({ board: board })
+        return board;
+      })
+      .then((board) => {
+        return this.store.getLists(board.id)
+      })
+      .then(lists => {
+        this.setState({ lists: lists })
+
+        lists.forEach(list => {
+          this.store.getCards(list.id)
+            .then(cards => this.setState({ 
+              cards: this.state.cards.concat(cards) 
+            }));
+        })
+      })
   }
 
   onDragEnd(result) {
-    var { destination, source, type, draggableId } = result;
+    var result = this.store.onDragEnd(result);
 
-    // dropped outside the list
-    if (destination) {
-      return;
+    if (result.type === "COLUMN") {
+      this.setState({lists: result.collection});
     }
-  
-    else if (destination.droppableId === source.droppableId) {
-      // var reordered = reorder(
-      //   this.store.,
-      //   result.source.index,
-      //   result.destination.index
-      // );
-
-      if (type === "COLUMN") {
-        console.log("SHUFFLE LISTS")
-      }
-      else if (type === "CARD") {
-        console.log("SHUFFLE CARDS")
-      }
+    else if (result.type === "CARD") {
+      this.setState({cards: result.collection});
     }
-
-    else {
-      console.log("SHUFFLE CARDS AND LISTS")
-    }
-    console.log(result)
   }
 
   render() {
@@ -70,7 +63,11 @@ class App extends React.Component {
       <DragDropContext onDragEnd={this.onDragEnd}>
         <div className="container">
           <Navbar />
-          <Board board={this.state.board} />
+          <Board 
+            board={this.state.board}
+            lists={this.state.lists}
+            cards={this.state.cards}
+             />
         </div>
       </DragDropContext>
     )

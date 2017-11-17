@@ -3,6 +3,8 @@ import React from 'react';
 import Card from './Card';
 import ListForm from './ListForm';
 
+import Store from './data-store';
+
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 function getClassNames(isDragging) {
@@ -13,7 +15,7 @@ class List extends React.Component {
   constructor(props) {
     super(props);
 
-    this.toggleCreateCardForm = this.toggleCreateCardForm.bind(this);
+    this.toggleForm = this.toggleForm.bind(this);
     this.onsubmit = this.onsubmit.bind(this);
     this.cardCreateFormOrCreateButton = this.cardCreateFormOrCreateButton.bind(this);
 
@@ -23,14 +25,11 @@ class List extends React.Component {
     }
   }
 
-  componentDidMount() {
-    fetch("/api/v1/cards?list_id=" + this.props.list.id)
-      .then(response => response.json())
-      .then(json => this.setState({cards: json.data}))
-      .catch(console.error);
+  componentWillReceiveProps(nextProps) {
+    this.setState({cards: nextProps.cards})
   }
 
-  toggleCreateCardForm() {
+  toggleForm() {
     this.setState({creating: !this.state.creating});
   }
 
@@ -56,7 +55,7 @@ class List extends React.Component {
     if (this.state.creating) {
       return (
         <ListForm
-          onclose={this.toggleCreateCardForm}
+          onclose={this.toggleForm}
           onsubmit={this.onsubmit} />
         );
     }
@@ -64,13 +63,13 @@ class List extends React.Component {
     return (
       <button
         className="btn btn-toggle"
-        onClick={this.toggleCreateCardForm}>Add a card</button>
+        onClick={this.toggleForm}>Add a card</button>
     );
   }
 
   render() {
     const draggableId = `list-${this.props.list.id}`;
-    const droppableId = `list-${this.props.list.id}`;
+    const droppableId = `LIST-${this.props.list.id}`;
 
     return (
       <Draggable draggableId={draggableId} type="COLUMN" >
