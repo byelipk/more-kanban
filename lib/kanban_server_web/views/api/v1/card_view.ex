@@ -12,7 +12,7 @@ defmodule KanbanWeb.Api.V1.CardView do
   end
 
   def render("card.json", %{card: card}) do
-    %{id: card.id, body: card.body, list_id: card.list_id}
+    %{id: card.id, body: card.body, list_id: card.list_id, row_order: card.row_order}
   end
 
   def render("missing-list.json", _params) do

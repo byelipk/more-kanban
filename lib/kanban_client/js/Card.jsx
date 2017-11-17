@@ -28,7 +28,7 @@ class Card extends React.Component {
     var card = this.state.card;
 
     if (value) {
-      this.props.store.updateCard(card, value)
+      this.props.store.updateCard(Object.assign({}, card, {body: value}))
         .then(updatedCard => {
           this.setState({ card: updatedCard, editing: false })
         })
