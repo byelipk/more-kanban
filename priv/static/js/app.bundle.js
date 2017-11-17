@@ -3042,12 +3042,17 @@ var DataStore = function () {
     _classCallCheck(this, DataStore);
 
     this.store = new Map();
-    this.store.set('boards', new Set());
+    this.store.set('boards', []);
     this.store.set('lists', []);
     this.store.set('cards', []);
   }
 
   _createClass(DataStore, [{
+    key: 'get',
+    value: function get(cacheKey) {
+      return this.store.get(cacheKey);
+    }
+  }, {
     key: 'getBoard',
     value: function getBoard(id) {
       var _this = this;
@@ -3055,7 +3060,7 @@ var DataStore = function () {
       return fetch('/api/v1/boards/' + id).then(function (response) {
         return response.json();
       }).then(function (json) {
-        _this.push("boards", json.data);
+        _this.store.get("boards").push(json.data);
         return json.data;
       }).catch(console.error);
     }
@@ -3088,9 +3093,50 @@ var DataStore = function () {
       }).catch(console.error);
     }
   }, {
-    key: 'push',
-    value: function push(type, data) {
-      this.store.get(type).add(data);
+    key: 'addCard',
+    value: function addCard(payload) {
+      var _this4 = this;
+
+      return fetch("/api/v1/cards", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: payload })
+      }).then(function (response) {
+        return response.json();
+      }).then(function (card) {
+        _this4.store.get("cards").push(card.data);
+
+        return card.data;
+      }).catch(function (error) {
+        return console.error(error);
+      });
+    }
+  }, {
+    key: 'updateCard',
+    value: function updateCard(card, value) {
+      var _this5 = this;
+
+      return fetch("/api/v1/cards/" + card.id, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: { body: value } })
+      }).then(function (response) {
+        return response.json();
+      }).then(function (updatedCard) {
+        var cards = _this5.store.get('cards');
+        for (var i = 0; i < cards.length; i += 1) {
+          if (cards[i].id === updatedCard.id) {
+            cards[i] = updatedCard;
+          }
+        }
+        return updatedCard.data;
+      }).catch(function (error) {
+        return console.error(error);
+      });
     }
   }, {
     key: 'onDragEnd',
@@ -5273,6 +5319,7 @@ var App = function (_React$Component) {
     };
 
     _this.onDragEnd = _this.onDragEnd.bind(_this);
+    _this.reloadCards = _this.reloadCards.bind(_this);
     return _this;
   }
 
@@ -5310,6 +5357,13 @@ var App = function (_React$Component) {
       }
     }
   }, {
+    key: 'reloadCards',
+    value: function reloadCards() {
+      this.setState({
+        cards: this.store.get("cards")
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -5322,7 +5376,11 @@ var App = function (_React$Component) {
           _react2.default.createElement(_Board2.default, {
             board: this.state.board,
             lists: this.state.lists,
-            cards: this.state.cards
+            cards: this.state.cards,
+            store: this.store,
+            listCallbacks: {
+              reloadCards: this.reloadCards
+            }
           })
         )
       );
@@ -25781,6 +25839,8 @@ var Board = function (_React$Component) {
               { className: "board-body" },
               _this2.state.lists.map(function (list) {
                 return _react2.default.createElement(_List2.default, {
+                  store: _this2.props.store,
+                  listCallbacks: _this2.props.listCallbacks,
                   key: list.id,
                   list: list,
                   cards: _this2.state.cards.filter(function (card) {
@@ -25879,22 +25939,16 @@ var List = function (_React$Component) {
     value: function onsubmit(value) {
       var _this2 = this;
 
-      fetch(this.state.uri, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ data: { body: value, list_id: this.props.list.id } })
-      }).then(function (response) {
-        return response.json();
-      }).then(function (card) {
-        _this2.setState({
-          cards: _this2.state.cards.concat(card.data),
-          creating: !_this2.state.creating
+      if (value) {
+        this.props.store.addCard({
+          body: value, list_id: this.props.list.id
+        }).then(function () {
+          _this2.props.listCallbacks.reloadCards();
+          _this2.setState({
+            creating: !_this2.state.creating
+          });
         });
-      }).catch(function (error) {
-        return console.error(error);
-      });
+      }
     }
   }, {
     key: 'cardCreateFormOrCreateButton',
@@ -25948,7 +26002,10 @@ var List = function (_React$Component) {
                     'section',
                     { className: 'list-content', ref: provided.innerRef },
                     _this3.state.cards.map(function (card) {
-                      return _react2.default.createElement(_Card2.default, { key: card.id, card: card });
+                      return _react2.default.createElement(_Card2.default, {
+                        key: card.id,
+                        card: card,
+                        store: _this3.props.store });
                     }),
                     provided.placeholder
                   );
@@ -26017,7 +26074,7 @@ var Card = function (_React$Component) {
 
     _this.onclick = _this.onclick.bind(_this);
     _this.onsubmit = _this.onsubmit.bind(_this);
-    _this.cardEditFormOrCardBody = _this.cardEditFormOrCardBody.bind(_this);
+    _this.renderCard = _this.renderCard.bind(_this);
 
     _this.state = {
       editing: false,
@@ -26037,23 +26094,17 @@ var Card = function (_React$Component) {
     value: function onsubmit(value) {
       var _this2 = this;
 
-      fetch(this.state.uri + this.state.card.id, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ data: { body: value } })
-      }).then(function (response) {
-        return response.json();
-      }).then(function (card) {
-        _this2.setState({ card: card.data, editing: !_this2.state.editing });
-      }).catch(function (error) {
-        return console.error(error);
-      });
+      var card = this.state.card;
+
+      if (value) {
+        this.props.store.updateCard(card, value).then(function (updatedCard) {
+          _this2.setState({ card: updatedCard, editing: false });
+        });
+      }
     }
   }, {
-    key: 'cardEditFormOrCardBody',
-    value: function cardEditFormOrCardBody() {
+    key: 'renderCard',
+    value: function renderCard(provided) {
       if (this.state.editing) {
         return _react2.default.createElement(_ListForm2.default, {
           onclose: this.onclick,
@@ -26062,19 +26113,23 @@ var Card = function (_React$Component) {
       } else {
         return _react2.default.createElement(
           'div',
-          { className: 'card-body' },
+          _extends({ className: 'card', ref: provided.innerRef, style: provided.draggableStyle }, provided.dragHandleProps),
           _react2.default.createElement(
             'div',
-            { className: 'card-details' },
-            this.state.card.body
-          ),
-          _react2.default.createElement(
-            'div',
-            { className: 'card-actions' },
+            { className: 'card-body' },
             _react2.default.createElement(
-              'button',
-              { onClick: this.onclick },
-              _react2.default.createElement('i', { className: 'far fa-edit' })
+              'div',
+              { className: 'card-details' },
+              this.state.card.body
+            ),
+            _react2.default.createElement(
+              'div',
+              { className: 'card-actions' },
+              _react2.default.createElement(
+                'button',
+                { onClick: this.onclick },
+                _react2.default.createElement('i', { className: 'far fa-edit' })
+              )
             )
           )
         );
@@ -26090,32 +26145,11 @@ var Card = function (_React$Component) {
       return _react2.default.createElement(
         _reactBeautifulDnd.Draggable,
         { draggableId: draggableId, type: 'CARD' },
-        function (provided, snapshot) {
+        function (provided) {
           return _react2.default.createElement(
             'div',
             null,
-            _react2.default.createElement(
-              'div',
-              _extends({ className: 'card', ref: provided.innerRef, style: provided.draggableStyle }, provided.dragHandleProps),
-              _react2.default.createElement(
-                'div',
-                { className: 'card-body' },
-                _react2.default.createElement(
-                  'div',
-                  { className: 'card-details' },
-                  _this3.state.card.body
-                ),
-                _react2.default.createElement(
-                  'div',
-                  { className: 'card-actions' },
-                  _react2.default.createElement(
-                    'button',
-                    { onClick: _this3.onclick },
-                    _react2.default.createElement('i', { className: 'far fa-edit' })
-                  )
-                )
-              )
-            ),
+            _this3.renderCard(provided),
             provided.placeholder
           );
         }
