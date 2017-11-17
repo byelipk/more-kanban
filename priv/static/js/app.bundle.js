@@ -3072,10 +3072,17 @@ var DataStore = function () {
       return fetch("/api/v1/lists?board_id=" + boardId).then(function (response) {
         return response.json();
       }).then(function (json) {
-        json.data.forEach(function (list) {
+        var lists = json.data;
+
+        lists.sort(function (a, b) {
+          return a.row_order > b.row_order;
+        });
+
+        lists.forEach(function (list) {
           return _this2.store.get("lists").push(list);
         });
-        return json.data;
+
+        return lists;
       }).catch(console.error);
     }
   }, {
@@ -3118,13 +3125,15 @@ var DataStore = function () {
     value: function updateCard(card, value) {
       var _this5 = this;
 
-      return fetch("/api/v1/cards/" + card.id, {
+      var options = {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ data: { body: value } })
-      }).then(function (response) {
+      };
+
+      return fetch("/api/v1/cards/" + card.id, options).then(function (response) {
         return response.json();
       }).then(function (updatedCard) {
         var cards = _this5.store.get('cards');
@@ -3137,6 +3146,39 @@ var DataStore = function () {
       }).catch(function (error) {
         return console.error(error);
       });
+    }
+  }, {
+    key: 'updateList',
+    value: function updateList(list) {
+      var options = {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ data: list })
+      };
+
+      return fetch("/api/v1/lists/" + list.id, options).then(function (response) {
+        return response.json();
+      }).then(function (json) {
+        return json.data;
+      }).catch(console.error);
+    }
+  }, {
+    key: 'persistListOrdering',
+    value: function persistListOrdering(lists) {
+      var result = [];
+
+      for (var i = 0; i < lists.length; i += 1) {
+        if (i + 1 !== lists[i].row_order) {
+          result.push(Object.assign({}, lists[i], { row_order: i + 1 }));
+          this.updateList(result[result.length - 1]);
+        } else {
+          result.push(lists[i]);
+        }
+      }
+
+      return result;
     }
   }, {
     key: 'onDragEnd',
@@ -3157,6 +3199,7 @@ var DataStore = function () {
 
         if (type === "COLUMN" && droppableId.indexOf("BOARD-") === 0) {
           collection = this.swapListsInBoard(droppableId, source, destination);
+          collection = this.persistListOrdering(collection);
         } else if (type === "CARD" && droppableId.indexOf("LIST-") === 0) {
           collection = this.swapCardsInList(droppableId, source, destination);
         }

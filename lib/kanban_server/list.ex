@@ -6,6 +6,7 @@ defmodule Kanban.List do
 
   schema "lists" do
     field :name, :string
+    field :row_order, :integer
     belongs_to :board, Kanban.Board
     has_many :cards, Kanban.Card
 
@@ -15,7 +16,7 @@ defmodule Kanban.List do
   @doc false
   def changeset(%Kanban.List{} = list, attrs) do
     list
-    |> cast(attrs, [:name, :board_id])
-    |> validate_required([:name, :board_id])
+    |> cast(attrs, [:name, :board_id, :row_order])
+    |> validate_required([:name, :board_id, :row_order])
   end
 end

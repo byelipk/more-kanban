@@ -12,7 +12,7 @@ defmodule KanbanWeb.Api.V1.ListView do
   end
 
   def render("list.json", %{list: list}) do
-    %{id: list.id, name: list.name, board_id: list.board_id}
+    %{id: list.id, name: list.name, board_id: list.board_id, row_order: list.row_order}
   end
 
   def render("missing-board.json", _params) do
