@@ -3219,6 +3219,7 @@ var DataStore = function () {
         }
       } else {
         collection = this.swapCardBetweenLists(droppableId, draggableId, destination);
+        this.persistCardOrdering(collection);
       }
 
       return {
