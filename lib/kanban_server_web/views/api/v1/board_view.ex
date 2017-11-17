@@ -4,11 +4,11 @@ defmodule KanbanWeb.Api.V1.BoardView do
   alias KanbanWeb.Api.V1.BoardView
 
   def render("index.json", %{boards: boards}) do
-    %{data: render_many(boards, BoardView, "board.json")}
+    %{data: render_many(boards, BoardView, "board.json"), type: "board"}
   end
 
   def render("show.json", %{board: board}) do
-    %{data: render_one(board, BoardView, "board.json")}
+    %{data: render_one(board, BoardView, "board.json"), type: "board"}
   end
 
   def render("board.json", %{board: board}) do

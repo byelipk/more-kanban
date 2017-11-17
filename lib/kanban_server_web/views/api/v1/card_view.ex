@@ -4,15 +4,15 @@ defmodule KanbanWeb.Api.V1.CardView do
   alias KanbanWeb.Api.V1.CardView
 
   def render("index.json", %{cards: cards}) do
-    %{data: render_many(cards, CardView, "card.json")}
+    %{data: render_many(cards, CardView, "card.json"), type: "card"}
   end
 
   def render("show.json", %{card: card}) do
-    %{data: render_one(card, CardView, "card.json")}
+    %{data: render_one(card, CardView, "card.json"), type: "card"}
   end
 
   def render("card.json", %{card: card}) do
-    %{id: card.id, body: card.body}
+    %{id: card.id, body: card.body, list_id: card.list_id}
   end
 
   def render("missing-list.json", _params) do
