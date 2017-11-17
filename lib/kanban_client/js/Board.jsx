@@ -35,6 +35,8 @@ class Board extends React.Component {
               <div className="board-body">
                   {this.state.lists.map(list => (
                     <List 
+                      store={this.props.store}
+                      listCallbacks={this.props.listCallbacks}
                       key={list.id} 
                       list={list} 
                       cards={this.state.cards.filter(card => card.list_id === list.id)}

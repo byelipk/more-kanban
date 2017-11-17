@@ -34,21 +34,17 @@ class List extends React.Component {
   }
 
   onsubmit(value) {
-    fetch(this.state.uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ data: { body: value, list_id: this.props.list.id } })
-    })
-    .then(response => response.json())
-    .then(card => {
-      this.setState({
-        cards: this.state.cards.concat(card.data),
-        creating: !this.state.creating
-      });
-    })
-    .catch(error => console.error(error));
+    if (value) {
+      this.props.store.addCard({ 
+        body: value, list_id: this.props.list.id 
+      })
+      .then(() => {
+        this.props.listCallbacks.reloadCards();
+        this.setState({
+          creating: !this.state.creating
+        });
+      })
+    }
   }
 
   cardCreateFormOrCreateButton() {

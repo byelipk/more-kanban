@@ -24,6 +24,7 @@ class App extends React.Component {
     }
 
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.reloadCards = this.reloadCards.bind(this);
   }
 
   componentDidMount() {
@@ -58,6 +59,12 @@ class App extends React.Component {
     }
   }
 
+  reloadCards() {
+    this.setState({
+      cards: this.store.get("cards")
+    });
+  }
+
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
@@ -67,6 +74,10 @@ class App extends React.Component {
             board={this.state.board}
             lists={this.state.lists}
             cards={this.state.cards}
+            store={this.store}
+            listCallbacks={{
+              reloadCards: this.reloadCards
+            }}
              />
         </div>
       </DragDropContext>
