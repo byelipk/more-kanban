@@ -11,7 +11,7 @@ class Card extends React.Component {
 
     this.onclick  = this.onclick.bind(this);
     this.onsubmit = this.onsubmit.bind(this);
-    this.cardEditFormOrCardBody = this.cardEditFormOrCardBody.bind(this);
+    this.renderCard = this.renderCard.bind(this);
 
     this.state = {
       editing: false,
@@ -25,21 +25,17 @@ class Card extends React.Component {
   }
 
   onsubmit(value) {
-    fetch(this.state.uri + this.state.card.id, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ data: { body: value } })
-    })
-    .then(response => response.json())
-    .then(card => {
-      this.setState({card: card.data, editing: !this.state.editing})
-    })
-    .catch(error => console.error(error));
+    var card = this.state.card;
+
+    if (value) {
+      this.props.store.updateCard(card, value)
+        .then(updatedCard => {
+          this.setState({ card: updatedCard, editing: false })
+        })
+    }
   }
 
-  cardEditFormOrCardBody() {
+  renderCard(provided) {
     if (this.state.editing) {
       return (
         <ListForm
@@ -49,14 +45,16 @@ class Card extends React.Component {
       );
     } else {
       return (
-        <div className="card-body">
-          <div className="card-details">
-            {this.state.card.body}
-          </div>
-          <div className="card-actions">
-            <button onClick={this.onclick}>
-              <i className="far fa-edit"></i>
-            </button>
+        <div className="card" ref={provided.innerRef} style={provided.draggableStyle} {...provided.dragHandleProps}>
+          <div className="card-body">
+            <div className="card-details">
+              {this.state.card.body}
+            </div>
+            <div className="card-actions">
+              <button onClick={this.onclick}>
+                <i className="far fa-edit"></i>
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -68,20 +66,9 @@ class Card extends React.Component {
 
     return (
       <Draggable draggableId={draggableId} type="CARD" >
-        {(provided, snapshot) => (
+        {(provided) => (
           <div>
-            <div className="card" ref={provided.innerRef} style={provided.draggableStyle} {...provided.dragHandleProps}>
-              <div className="card-body">
-                <div className="card-details">
-                  {this.state.card.body}
-                </div>
-                <div className="card-actions">
-                  <button onClick={this.onclick}>
-                    <i className="far fa-edit"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            {this.renderCard(provided)}
             {provided.placeholder}
           </div>
         )}

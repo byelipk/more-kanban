@@ -80,7 +80,10 @@ class List extends React.Component {
                 {(provided, snapshot) => (
                   <section className="list-content" ref={provided.innerRef}>
                     {this.state.cards.map(card => (
-                      <Card key={card.id} card={card} /> 
+                      <Card 
+                        key={card.id} 
+                        card={card} 
+                        store={this.props.store} /> 
                     ))}
                     {provided.placeholder}
                   </section>
