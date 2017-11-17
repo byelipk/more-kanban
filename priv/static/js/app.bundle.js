@@ -3212,10 +3212,10 @@ var DataStore = function () {
 
         if (type === "COLUMN" && droppableId.indexOf("BOARD-") === 0) {
           collection = this.swapListsInBoard(droppableId, source, destination);
-          collection = this.persistListOrdering(collection);
+          this.persistListOrdering(collection);
         } else if (type === "CARD" && droppableId.indexOf("LIST-") === 0) {
           collection = this.swapCardsInList(droppableId, source, destination);
-          collection = this.persistCardOrdering(collection);
+          this.persistCardOrdering(collection);
         }
       } else {
         collection = this.swapCardBetweenLists(droppableId, draggableId, destination);
