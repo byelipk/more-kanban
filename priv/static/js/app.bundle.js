@@ -3020,6 +3020,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // import ListenerSupport from './listener-support';
@@ -3046,8 +3048,8 @@ var DataStore = function () {
     this.store.set('lists', []);
     this.store.set('cards', []);
 
-    // this.updateCard = this.updateCard.bind(this);
-    // this.updateList = this.updateList.bind(this);
+    this.updateCard = this.updateCard.bind(this);
+    this.updateList = this.updateList.bind(this);
   }
 
   _createClass(DataStore, [{
@@ -3133,6 +3135,8 @@ var DataStore = function () {
   }, {
     key: 'updateCard',
     value: function updateCard(card) {
+      var _this5 = this;
+
       var options = {
         method: 'PUT',
         headers: {
@@ -3143,8 +3147,16 @@ var DataStore = function () {
 
       return fetch("/api/v1/cards/" + card.id, options).then(function (response) {
         return response.json();
-      }).then(function (json) {
-        return json.data;
+      }).then(function (card) {
+        var cards = _this5.store.get('cards').slice();
+
+        for (var i = 0; i < cards.length; i += 1) {
+          if (cards[i].id === card.data.id) {
+            cards[i] = card.data;break;
+          }
+        }
+
+        _this5.store.set("cards", cards);
       }).catch(function (error) {
         return console.error(error);
       });
@@ -3167,31 +3179,44 @@ var DataStore = function () {
       }).catch(console.error);
     }
   }, {
-    key: 'persistOrdering',
-    value: function persistOrdering(list, callback) {
-      var result = [];
+    key: 'persistListOrdering',
+    value: function persistListOrdering(oldLists, newLists) {
+      newLists = newLists.map(function (l, idx) {
+        return Object.assign({}, l, { row_order: idx + 1 });
+      });
 
-      for (var i = 0; i < list.length; i += 1) {
-        if (i + 1 !== list[i].row_order) {
-          var item = Object.assign({}, list[i], { row_order: i + 1 });
-          result.push(item);
-          callback(item);
-        } else {
-          result.push(list[i]);
-        }
+      for (var i = 0; i < oldLists.length; i += 1) {
+        if (oldLists[i].id !== newLists[i].id) {
+          this.updateList(newLists[i]);
+        };
       }
 
-      return result;
-    }
-  }, {
-    key: 'persistListOrdering',
-    value: function persistListOrdering(lists) {
-      return this.persistOrdering(lists, this.updateList);
+      return newLists;
     }
   }, {
     key: 'persistCardOrdering',
-    value: function persistCardOrdering(cards) {
-      return this.persistOrdering(cards, this.updateCard);
+    value: function persistCardOrdering(oldCards, newCards) {
+      newCards = newCards.map(function (c, idx) {
+        return Object.assign({}, c, { row_order: idx + 1 });
+      });
+
+      for (var i = 0; i < newCards.length; i += 1) {
+        var cardsInOldListExhausted = oldCards[i] === undefined;
+
+        if (!cardsInOldListExhausted) {
+          var differentCard = oldCards[i].id !== newCards[i].id;
+          var differentRowOrder = oldCards[i].row_order !== newCards[i].row_order;
+          var firstItemInList = newCards.length === 1;
+
+          if (differentCard || differentRowOrder || firstItemInList) {
+            this.updateCard(newCards[i]);
+          }
+        } else {
+          this.updateCard(newCards[i]);
+        }
+      }
+
+      return newCards;
     }
   }, {
     key: 'onDragEnd',
@@ -3201,25 +3226,18 @@ var DataStore = function () {
           source = result.source,
           type = result.type,
           draggableId = result.draggableId;
-
-      // dropped outside the list
-
-      if (!destination) {
-        return;
-      } else if (destination.droppableId === source.droppableId) {
-        var droppableId = destination.droppableId;
+      var dstDroppableId = destination.droppableId;
+      var srcDroppableId = source.droppableId;
 
 
-        if (type === "COLUMN" && droppableId.indexOf("BOARD-") === 0) {
-          collection = this.swapListsInBoard(droppableId, source, destination);
-          this.persistListOrdering(collection);
-        } else if (type === "CARD" && droppableId.indexOf("LIST-") === 0) {
-          collection = this.swapCardsInList(droppableId, source, destination);
-          this.persistCardOrdering(collection);
+      if (dstDroppableId === srcDroppableId) {
+        if (type === "COLUMN" && dstDroppableId.indexOf("BOARD-") === 0) {
+          collection = this.swapListsInBoard(dstDroppableId, source, destination);
+        } else if (type === "CARD" && dstDroppableId.indexOf("LIST-") === 0) {
+          collection = this.swapCardsInList(dstDroppableId, source, destination);
         }
       } else {
-        collection = this.swapCardBetweenLists(droppableId, draggableId, destination);
-        this.persistCardOrdering(collection);
+        collection = this.swapCardBetweenLists(dstDroppableId, draggableId, destination.index);
       }
 
       return {
@@ -3229,39 +3247,53 @@ var DataStore = function () {
     }
   }, {
     key: 'swapCardBetweenLists',
-    value: function swapCardBetweenLists(droppableId, draggableId, destination) {
+    value: function swapCardBetweenLists(droppableId, draggableId, dstIndex) {
       draggableId = Number(draggableId.slice(5));
-      droppableId = Number(destination.droppableId.slice(5));
+      droppableId = Number(droppableId.slice(5));
 
-      var include = [];
-      var exclude = [];
-      var cards = this.store.get("cards");
       var card;
+      var srcListId;
+      var cards = this.store.get("cards");
+      var srcList = [];
+      var dstList = [];
+      var outList = [];
 
       for (var i = 0; i < cards.length; i += 1) {
         if (cards[i].id === draggableId) {
-          card = Object.assign({}, cards[i], { list_id: droppableId });
+          card = cards[i];
+          srcListId = card.list_id;
+          card = Object.assign({}, card, { list_id: droppableId });
+        } else if (cards[i].list_id === srcListId) {
+          srcList.push(cards[i]);
         } else if (cards[i].list_id === droppableId) {
-          include.push(cards[i]);
+          dstList.push(cards[i]);
         } else {
-          exclude.push(cards[i]);
+          outList.push(cards[i]);
         }
       }
 
-      include.splice(destination.index, 0, card);
+      // Update source list
+      srcList = this.persistCardOrdering(srcList, srcList.slice());
 
-      this.store.set("cards", exclude.concat(include));
+      // Update destination list - inplace modification
+      var oldDstList = dstList.slice();
+      dstList.splice(dstIndex, 0, card);
+      dstList = this.persistCardOrdering(oldDstList, dstList);
+
+      this.store.set("cards", [].concat(outList, _toConsumableArray(srcList), _toConsumableArray(dstList)));
 
       return this.store.get("cards");
     }
   }, {
     key: 'swapListsInBoard',
     value: function swapListsInBoard(droppableId, source, destination) {
-      var result;
+      var result,
+          collection = this.store.get("lists");
 
       droppableId = Number(droppableId.slice(6));
 
-      result = reorder(this.store.get('lists'), source.index, destination.index);
+      result = reorder(collection, source.index, destination.index);
+      result = this.persistListOrdering(collection, result);
 
       this.store.set("lists", result);
 
@@ -3272,21 +3304,22 @@ var DataStore = function () {
     value: function swapCardsInList(droppableId, source, destination) {
       droppableId = Number(droppableId.slice(5));
 
-      var result;
       var cards = this.store.get('cards');
-      var exclude = [];
-      var include = [];
+      var inList = [];
+      var outList = [];
 
       for (var i = 0; i < cards.length; i += 1) {
         if (cards[i].list_id === droppableId) {
-          include.push(cards[i]);
+          inList.push(cards[i]);
         } else {
-          exclude.push(cards[i]);
+          outList.push(cards[i]);
         }
       }
 
-      include = reorder(include, source.index, destination.index);
-      result = exclude.concat(include);
+      var result = reorder(inList, source.index, destination.index);
+      result = this.persistCardOrdering(inList, result);
+      result = outList.concat(result);
+
       this.store.set("cards", result);
 
       return result;
@@ -5406,6 +5439,8 @@ var App = function (_React$Component) {
   }, {
     key: 'onDragEnd',
     value: function onDragEnd(result) {
+      if (!result.destination) return;
+
       var result = this.store.onDragEnd(result);
 
       if (result.type === "COLUMN") {
@@ -25999,7 +26034,8 @@ var List = function (_React$Component) {
 
       if (value) {
         this.props.store.addCard({
-          body: value, list_id: this.props.list.id
+          body: value,
+          list_id: this.props.list.id
         }).then(function () {
           _this2.props.listCallbacks.reloadCards();
           _this2.setState({

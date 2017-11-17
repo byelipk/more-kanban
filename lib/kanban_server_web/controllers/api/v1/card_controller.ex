@@ -22,8 +22,17 @@ defmodule KanbanWeb.Api.V1.CardController do
     end
   end
 
-  def create(conn, params) do
-    changeset = Card.changeset(%Card{}, params["data"])
+  def create(conn, %{"data" => attrs}) do
+    count = Repo.one(
+      from c in Card, 
+      select: count("*"), 
+      where: c.list_id == ^attrs["list_id"]
+    )
+
+    changeset = Card.changeset(
+      %Card{}, 
+      Map.merge(attrs, %{"row_order" => count + 1})
+    )
 
     case Repo.insert(changeset) do
       {:error, details } ->
