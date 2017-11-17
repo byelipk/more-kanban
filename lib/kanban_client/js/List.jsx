@@ -68,7 +68,7 @@ class List extends React.Component {
   }
 
   render() {
-    const draggableId = `list-${this.props.list.id}`;
+    const draggableId = `LIST-${this.props.list.id}`;
     const droppableId = `LIST-${this.props.list.id}`;
 
     return (

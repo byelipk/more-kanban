@@ -64,7 +64,7 @@ class Card extends React.Component {
   }
 
   render() {
-    const draggableId = `card-${this.state.card.id}`;
+    const draggableId = `CARD-${this.state.card.id}`;
 
     return (
       <Draggable draggableId={draggableId} type="CARD" >
