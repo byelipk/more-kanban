@@ -187,6 +187,7 @@ body {
   padding: 0.5rem;
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
+  min-height: 50px;
 }
 .card-body {
   display: flex;

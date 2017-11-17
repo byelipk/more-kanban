@@ -1,15 +1,15 @@
 import React from 'react';
 
+import Card from './Card';
 import ListForm from './ListForm';
-import ListCard from './ListCard';
 
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from 'react-beautiful-dnd';
 
 function getClassNames(isDragging) {
   return `list-inner ${isDragging ? 'is-dragging' : ''}`;
 }
 
-class BoardList extends React.Component {
+class List extends React.Component {
   constructor(props) {
     super(props);
 
@@ -20,14 +20,14 @@ class BoardList extends React.Component {
     this.state = {
       cards: [],
       creating: false,
-      uri: '/api/v1/cards'
     }
   }
 
   componentDidMount() {
-    fetch(`${this.state.uri}?list_id=${this.props.list.id}`)
+    fetch("/api/v1/cards?list_id=" + this.props.list.id)
       .then(response => response.json())
-      .then(cards => this.setState({cards: cards.data}))
+      .then(json => this.setState({cards: json.data}))
+      .catch(console.error);
   }
 
   toggleCreateCardForm() {
@@ -68,19 +68,30 @@ class BoardList extends React.Component {
     );
   }
 
-
   render() {
+    const draggableId = `list-${this.props.list.id}`;
+    const droppableId = `list-${this.props.list.id}`;
+
     return (
-      <Draggable draggableId={this.props.list.id} type="COLUMN" >
+      <Draggable draggableId={draggableId} type="COLUMN" >
         {(provided, snapshot)=> (
           <div className="list-card">
             <div className={getClassNames(snapshot.isDragging)} ref={provided.innerRef} style={provided.draggableStyle}>
               <header className="list-header" {...provided.dragHandleProps}>
                 <h3>{this.props.list.name}</h3>
               </header>
-              <section className="list-content">
-                {this.state.cards.map(card => <ListCard key={card.id} card={card} /> )}
-              </section>
+
+              <Droppable droppableId={droppableId} type="CARD" direction="vertical" >
+                {(provided, snapshot) => (
+                  <section className="list-content" ref={provided.innerRef}>
+                    {this.state.cards.map(card => (
+                      <Card key={card.id} card={card} /> 
+                    ))}
+                    {provided.placeholder}
+                  </section>
+                )}
+              </Droppable>
+
               <footer className="list-footer">
                 {this.cardCreateFormOrCreateButton()}
               </footer>
@@ -93,4 +104,4 @@ class BoardList extends React.Component {
   }
 }
 
-export default BoardList;
+export default List;
