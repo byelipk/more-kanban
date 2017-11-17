@@ -36,7 +36,8 @@ class List extends React.Component {
   onsubmit(value) {
     if (value) {
       this.props.store.addCard({ 
-        body: value, list_id: this.props.list.id 
+        body: value, 
+        list_id: this.props.list.id
       })
       .then(() => {
         this.props.listCallbacks.reloadCards();
